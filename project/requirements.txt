@@ -1,0 +1,15 @@
+numpy>=1.24
+pandas>=1.5
+nltk>=3.8
+tensorflow>=2.12
+keras>=2.12
+scikit-learn>=1.2
+matplotlib>=3.6
+seaborn>=0.12
+plotly>=5.15
+joblib>=1.2
+textblob>=0.17
+wordcloud>=1.8
+Pillow>=9.4
+requests>=2.28
+mlflow>=2.9.0
