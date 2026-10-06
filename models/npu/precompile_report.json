@@ -1,0 +1,41 @@
+{
+  "craft_768": {
+    "compile_job": "jg9o0mwwg",
+    "inference_job": "jp4en1v8g",
+    "device": "Snapdragon X Plus 8-Core CRD",
+    "status": "SUCCESS",
+    "calls": 6,
+    "min_correlation": 0.9999717099863115,
+    "max_abs_diff": 0.07456406950950623,
+    "output_scale": 10.5116605758667,
+    "identical_to_cpu": false,
+    "replay_inputs_match": true,
+    "page_text_identical": true
+  },
+  "vietocr_cnn": {
+    "compile_job": "jp1o2je85",
+    "inference_job": "jpx094y3p",
+    "device": "Snapdragon X Plus 8-Core CRD",
+    "status": "SUCCESS",
+    "calls": 34,
+    "min_correlation": 0.9999849002955364,
+    "max_abs_diff": 0.26776885986328125,
+    "output_scale": 56.33820343017578,
+    "identical_to_cpu": false,
+    "replay_inputs_match": true,
+    "page_text_identical": true
+  },
+  "vietocr_encoder_b8": {
+    "compile_job": "jgd6n3orp",
+    "inference_job": "jgn10n3kp",
+    "device": "Snapdragon X Plus 8-Core CRD",
+    "status": "RUNNING_INFERENCE",
+    "calls": 5,
+    "min_correlation": 0.999997160713776,
+    "max_abs_diff": 0.0391789972782135,
+    "output_scale": 2.404944658279419,
+    "identical_to_cpu": false,
+    "replay_inputs_match": true,
+    "page_text_identical": true
+  }
+}

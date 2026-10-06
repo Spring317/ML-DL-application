@@ -1,0 +1,6 @@
+# Native Windows ARM64 wheels exist for all of these (Python 3.11-3.13 ARM64 from python.org).
+onnxruntime-qnn>=2.0      # QNN plugin execution provider (Hexagon NPU); pulls in onnxruntime (CPU)
+numpy
+scipy
+pillow
+pymupdf

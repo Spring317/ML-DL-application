@@ -1,0 +1,6 @@
+# Any platform, CPU only (for testing the engine without a Snapdragon NPU)
+onnxruntime
+numpy
+scipy
+pillow
+pymupdf

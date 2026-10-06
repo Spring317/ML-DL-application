@@ -1,0 +1,71 @@
+# Builds the Windows ARM64 installer on GitHub's Windows 11 ARM runner, installs it silently and
+# checks the installed app's OCR output on the sample page. The runner has no Hexagon NPU, so the
+# test covers the CPU path; run "VNOCR self-test" on a Snapdragon laptop to check the NPU.
+#
+# Results are available two ways:
+#   - as the workflow artifact "VNOCR-Setup-arm64" (gh run download / Actions tab);
+#   - on the branch "vnocr-ci-output", for clients with only git/SSH access: status.txt, build.log and the
+#     installer split into <95 MB parts (GitHub's file limit). Rejoin with:
+#       cat VNOCR-Setup-*.exe.part* > VNOCR-Setup.exe   (Linux)   or   copy /b part0+part1 setup.exe (Windows)
+name: build-windows-arm64
+on:
+  workflow_dispatch:
+  push:
+    branches: [main, vnocr-build]
+    tags: ["v*"]
+permissions:
+  contents: write
+jobs:
+  installer:
+    runs-on: windows-11-arm
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          architecture: arm64
+      - name: Build exe and installer
+        id: build
+        shell: pwsh
+        run: ./build_installer.ps1 *>&1 | Tee-Object -FilePath "$env:RUNNER_TEMP\build.log"
+      - name: Install silently and test the installed app
+        id: test
+        shell: pwsh
+        run: |
+          $setup = Get-ChildItem dist\VNOCR-Setup-*-arm64.exe | Select-Object -First 1
+          Start-Process -Wait $setup.FullName -ArgumentList "/VERYSILENT", "/CURRENTUSER", "/SUPPRESSMSGBOXES", "/DIR=$env:RUNNER_TEMP\VNOCR"
+          Start-Process -Wait "$env:RUNNER_TEMP\VNOCR\VNOCR.exe" -ArgumentList "samples\sample_page.png", "-o", "$env:RUNNER_TEMP\installed.json"
+          python tools\smoke_test.py "$env:RUNNER_TEMP\installed.json" --max-cer 0.02 *>&1 | Tee-Object -FilePath "$env:RUNNER_TEMP\test.log"
+          if ($LASTEXITCODE -ne 0) { exit 1 }
+      - uses: actions/upload-artifact@v4
+        if: success()
+        with:
+          name: VNOCR-Setup-arm64
+          path: dist/VNOCR-Setup-*-arm64.exe
+      - name: Publish results to the vnocr-ci-output branch
+        if: always()
+        shell: pwsh
+        run: |
+          $out = "$env:RUNNER_TEMP\ci-output"
+          New-Item -ItemType Directory -Force $out | Out-Null
+          $status = "build=${{ steps.build.outcome }} test=${{ steps.test.outcome }} commit=$env:GITHUB_SHA run=$env:GITHUB_SERVER_URL/$env:GITHUB_REPOSITORY/actions/runs/$env:GITHUB_RUN_ID"
+          Set-Content "$out\status.txt" $status
+          foreach ($f in "build.log", "test.log") { if (Test-Path "$env:RUNNER_TEMP\$f") { Copy-Item "$env:RUNNER_TEMP\$f" $out } }
+          if (Test-Path "$env:LOCALAPPDATA\vnocr\vnocr.log") { Copy-Item "$env:LOCALAPPDATA\vnocr\vnocr.log" $out }
+          $setup = Get-ChildItem dist\VNOCR-Setup-*-arm64.exe -ErrorAction SilentlyContinue | Select-Object -First 1
+          if ($setup) {
+            $bytes = [IO.File]::ReadAllBytes($setup.FullName)
+            $chunk = 95MB
+            for ($i = 0; $i * $chunk -lt $bytes.Length; $i++) {
+              $len = [Math]::Min($chunk, $bytes.Length - $i * $chunk)
+              [IO.File]::WriteAllBytes("$out\$($setup.Name).part$i", $bytes[($i * $chunk)..($i * $chunk + $len - 1)])
+            }
+            (Get-FileHash $setup.FullName -Algorithm SHA256).Hash | Set-Content "$out\$($setup.Name).sha256"
+          }
+          Set-Location $out
+          git init -b vnocr-ci-output
+          git config user.name "github-actions"
+          git config user.email "github-actions@users.noreply.github.com"
+          git add -A
+          git commit -m "CI output: $status"
+          git push --force "https://x-access-token:${{ github.token }}@github.com/$env:GITHUB_REPOSITORY.git" vnocr-ci-output
