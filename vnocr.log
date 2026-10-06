@@ -1,0 +1,6 @@
+2026-10-05 20:39:50 QNN execution provider: not available
+2026-10-05 20:39:50 Model placement: craft_768=CPU, vietocr_cnn=CPU, vietocr_encoder_b8=CPU, vietocr_cross_kv_b8=CPU, vietocr_decoder_kv_b8=CPU (loaded in 0.3s)
+2026-10-05 20:40:19 1 page(s) in 28.8s (28.8s per page)
+2026-10-05 20:43:01 QNN execution provider: not available
+2026-10-05 20:43:01 Model placement: craft_768=CPU, vietocr_cnn=CPU, vietocr_encoder_b8=CPU, vietocr_cross_kv_b8=CPU, vietocr_decoder_kv_b8=CPU (loaded in 0.3s)
+2026-10-05 20:43:28 1 page(s) in 27.4s (27.4s per page)

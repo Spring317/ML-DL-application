@@ -1,0 +1,3 @@
+placement: {'craft_768': 'CPU', 'vietocr_cnn': 'CPU', 'vietocr_encoder_b8': 'CPU', 'vietocr_cross_kv_b8': 'CPU', 'vietocr_decoder_kv_b8': 'CPU'}
+characters: 1003  CER vs reference: 0.000%  (limit 2.0%)
+page 1: 34 lines, seconds {'detect': 16.23242920000007, 'layout': 4.838554000000045, 'recognize': 6.187541800000076, 'total': 27.25852500000019, 'decoder_steps': 162}
